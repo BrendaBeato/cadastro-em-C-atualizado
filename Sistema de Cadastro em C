@@ -1,0 +1,337 @@
+//BIBLIOTECAS DECLARADAS
+#include<stdio.h>
+#include<locale.h>
+#include<string.h> 
+#include<stdlib.h>
+#define NULO '\0'
+
+                            //DECLARANDO VARIAVEIS DO CADASTRO EM STRUCT
+struct cadastramento{
+	
+	FILE *arq; 
+	FILE *arq_temp;
+	FILE *arquivo_new;
+	char nome[100];
+	char profissao[100];
+ 	char cpf[100];
+	char continuar[1];
+	char buscar[100];
+	char buscar_cpf[100];
+	char buscar_profissao[100];
+	char alt_profi[100];
+	char tra_profi[100];
+	int opcao;
+	int alterar;
+	
+}cadastro;
+
+                            //ESPECIFICANDO A FUNÇÃO DE CADASTRO
+void cadastrar(){
+	
+	cadastro.arq = fopen("func.txt", "a"); //DECLARAÇÃO DO ARQUIVO PARA ARMAZENAR OS DADOS DO CADASTRO
+	
+	do{
+		fflush(stdin); //função p limpar o buffer de saída/entrada
+		printf("Digite o nome e sobrenome do funcionário:");
+		gets(cadastro.nome);
+		fprintf(cadastro.arq, "Nome - %s\n", cadastro.nome);//COMANDO P ARMAZENAMENTO NO ARQUIVO
+		printf("Digite sua profissão:");
+		gets(cadastro.profissao);
+		fprintf(cadastro.arq, "Profissão - %s\n", cadastro.profissao);
+		printf("Digite o cpf:");
+		gets(cadastro.cpf);
+		fprintf(cadastro.arq, "Cpf - %s", cadastro.cpf);
+		fprintf(cadastro.arq,"\n-------------------------------\n"); //organizar o arquivo
+		printf("\nQuer continuar? [S/N]:");
+		gets(cadastro.continuar);
+	
+		if(strcmp(cadastro.continuar,"s") == 0){
+			printf("Ok vamos continuar...");
+			system ("cls");
+		}
+		
+	}while(strcmp(cadastro.continuar,"s") == 0);
+	fclose(cadastro.arq);
+	system ("cls");
+}
+
+                                //ESPECIFICANDO A FUNÇÃO DE LISTAR
+void listar(){
+	
+cadastro.arq = fopen("func.txt", "r");
+char listas[200];
+
+
+while(fgets(listas,200,cadastro.arq)!=NULL){ 
+
+	printf("%s",listas); //printf p imprimir a lista na tela
+
+}
+fclose(cadastro.arq);
+system("pause"); 
+system ("cls");
+}
+
+void buscar(){
+	int j = 0;
+	int j1 = 0;
+	int j2 = 0;
+	int nao;
+	int nao1;
+	int nao2;
+	int teste;
+	//char listas[200];
+	cadastro.arq = fopen("func.txt", "r");
+	printf("-----------------------------------------------------------------------\n");
+	printf("|                       BUSCAR FUNCIONÁRIO                              |\n");
+	printf("-----------------------------------------------------------------------\n\n\n ");
+	fflush(stdin);
+	printf("Por favor,informe o nome do funcionário que deseja buscar:\n");
+	fgets(cadastro.buscar, 100, stdin);    
+	cadastro.buscar[strlen(cadastro.buscar) -1] = 0;  
+	do{
+		fgets(cadastro.nome, 1000, cadastro.arq);        
+		j++;        
+		if(strstr(cadastro.nome, cadastro.buscar) != NULL){
+			//printf("Linha %d: %s", j, cadastro.buscar);
+			nao = 1;
+			break; 
+			//strcpy(pegar_nome,cadastro.nome);           
+			//achou1 = 1;        
+		}				    
+	}while(!feof(cadastro.arq));
+	rewind(cadastro.arq);
+	printf("Por favor,informe a profissão do funcionário que deseja buscar:\n");
+	fgets(cadastro.buscar_profissao, 100, stdin);    
+	cadastro.buscar_profissao[strlen(cadastro.buscar_profissao) -1] = 0;  
+	do{
+		fgets(cadastro.profissao, 1000, cadastro.arq);        
+		j1++;        
+		if(strstr(cadastro.profissao, cadastro.buscar_profissao) != NULL){
+			//printf("Linha %d: %s", j1, cadastro.buscar_profissao);
+			//nao1 = j1;
+			nao1 = 1; 
+			break; 
+			//strcpy(pegar_nome,cadastro.nome);           
+			//achou1 = 1;        
+		}				    
+	}while(!feof(cadastro.arq));
+	rewind(cadastro.arq);
+	printf("Por favor,informe o CPF do funcionário que deseja buscar:\n");
+	fgets(cadastro.buscar_cpf, 100, stdin);    
+	cadastro.buscar_cpf[strlen(cadastro.buscar_cpf) -1] = 0;  
+	do{
+		fgets(cadastro.cpf, 1000, cadastro.arq);        
+		j2++;        
+		if(strstr(cadastro.cpf, cadastro.buscar_cpf) != NULL){
+			//printf("Linha %d: %s", j2, cadastro.buscar_cpf);
+			nao2 = 1; 
+			break;
+			//strcpy(pegar_nome,cadastro.nome);           
+			nao = 1;        
+		}				    
+	}while(!feof(cadastro.arq));
+	if(nao == 1 && nao1 == 1 && nao2 == 1){
+		printf("\nFoi encontrado o funcionário !");
+		printf("\nNome - %s", cadastro.buscar);
+		printf("\nProfissão - %s", cadastro.buscar_profissao);
+		printf("\nCpf - %s\n", cadastro.buscar_cpf);
+	}
+	if(nao != 1 && nao1 != 1 && nao2 != 1){
+		printf("\nNão foi encontrado o funcionário!\n");	
+	}
+	fclose(cadastro.arq);
+	system("pause"); 
+	system ("cls");
+}
+
+void editar(){
+
+	cadastro.arq = fopen("func.txt", "r");
+	cadastro.arq_temp = fopen("func_temp.txt", "w");
+	
+	int alcan = 0;
+	int pegar;
+	int li;
+	int linha = 1;
+	int valida = 0;
+	char nometrocar[100];
+	
+   printf("*-----------------------------------------------------------------------*\n");
+   printf("|                         EDITAR PROFISSÃO                              |\n");
+   printf("*-----------------------------------------------------------------------*\n\n\n ");
+	rewind(cadastro.arq);
+	fflush(stdin);
+	printf("Digite a profissão que deseja alterar:");
+	fgets(cadastro.alt_profi, 100, stdin);    
+	cadastro.alt_profi[strlen(cadastro.alt_profi) -1] = 0;    
+	do{
+		fgets(cadastro.profissao, 1000, cadastro.arq);        
+		alcan++;        
+		if(strstr(cadastro.profissao, cadastro.alt_profi) != NULL){
+		//printf("Linha %d: %s", bli, login.nome_trocar);
+		pegar = alcan;         
+	}				    
+	}while(!feof(cadastro.arq));
+	rewind(cadastro.arq);
+	
+	printf("\nQual profissão gostaria de colocar no lugar?");
+	fgets(cadastro.tra_profi, 100, stdin); 
+	//fflush(stdin);
+	for(li = 0; !feof(cadastro.arq);li++){
+	memset(nometrocar, NULO, 100); 
+	fgets(nometrocar, 101, cadastro.arq);
+	if(linha == pegar){
+		fprintf(cadastro.arq_temp, "Profissão - %s", cadastro.tra_profi); 
+		//fputs("", cadastro.arquivo_new); 
+		linha = linha + 1; 
+		valida = 1;
+		continue; 
+	}
+	linha = linha + 1; 
+	fputs(nometrocar, cadastro.arq_temp);
+	}
+	if(valida == 1){
+		printf("\nProfissão alterada!\n");
+	}
+	if(valida == 0){
+		printf("\nProfissão não alterada!\n");
+	}	
+	if(valida == 1){
+		valida = 0;
+	}
+	fclose(cadastro.arq); 
+	fclose(cadastro.arq_temp); 
+	remove("func.txt");
+	rename("func_temp.txt", "func.txt");
+	system("pause"); 
+	system ("cls");
+	}
+
+
+
+
+void apagar(){
+	int alcan = 0;
+	int pegar;
+	int li;
+	int linha = 1;
+	int valida = 0;
+	char nometrocar[100];
+	cadastro.arq = fopen("func.txt", "r");
+    cadastro.arq_temp = fopen("func_temp.txt", "w");
+
+printf("-----------------------------------------------------------------------\n");
+printf("|                        APAGAR CADASTRO                                |\n");
+printf("-----------------------------------------------------------------------\n\n ");
+printf("\n\n Digite o nome do funcionário que deseja apagar o cadastro: \n");
+fgets(cadastro.alt_profi, 100, stdin);
+
+if(linha == pegar){
+fputs("", cadastro.arquivo_new); 
+linha = linha + 1; 
+valida = 1;
+}
+linha = linha + 1; 
+fputs(cadastro.alt_profi, cadastro.arq_temp);
+	
+if(valida == 1){
+printf("\n Cadastro apagado!!\n");
+}
+if(valida == 0){
+printf("\nCadastro não apagado\n");
+}	
+if(valida == 1){
+valida = 0;
+}
+
+fclose(cadastro.arq); 
+fclose(cadastro.arq_temp); 
+remove("func.txt");
+rename("func_temp.txt", "func.txt");
+system("pause");
+system("cls");
+}
+
+
+                                        //MENU PRINCIPAL
+int main(void){
+	
+	setlocale(LC_ALL,"Portuguese");
+	
+	
+	
+do{
+
+	printf("\n   ---------------CADASTRO DE FUNCIONÁRIOS------------------");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |                     MENU PRINCIPAL                      |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |         1-Cadastrar                                     |");
+	printf("\n   |         2-Exibir lista de funcionários                  |");
+	printf("\n   |         3-Buscar funcionário                            |");
+	printf("\n   |         4-Editar profissão                              |");
+	printf("\n   |         5-Apagar cadastro                               |");
+	printf("\n   |         0-Encerrar sessão                               |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+ 	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   |                                                         |");
+	printf("\n   | Programadora: Brenda Beato                              |");
+	printf("\n   -------------------T.I ENTERPRISES-----------------------");
+	printf("\n\n\n Por favor, digite uma opção:");
+	scanf("%d",&cadastro.opcao);
+	
+	
+	                          // ESTRUTURA SWITCH P/AS OPÇÕES DE CADASTRO
+	switch(cadastro.opcao){    
+		case 1:
+			printf(" Processando...");
+			Sleep(2000);
+			system("cls");
+			cadastrar();
+	    	break;
+	    case 2:
+	        printf(" Processando...");
+			Sleep(2000);
+			system("cls");
+			listar();
+	    	break;
+	    case 3:
+	        printf(" Processando...");
+			Sleep(2000);
+			system("cls");
+			buscar();
+	        break;
+	    case 4:
+	        printf(" Processando...");
+			Sleep(2000);
+			system("cls");
+			editar();
+	        break;
+	    case 5:
+	    	printf(" Processando...");
+			Sleep(2000);
+			system("cls");
+			apagar();
+	    case 0:
+	        
+	        break;
+	                		
+	    default:
+	        printf("\n\n [!]ERRO [!]");                      //MENSAGEM DE ERRO PADRÃO
+	    	printf("\n Desculpe,opção inválida.");
+	}
+	
+                                                               
+   }while(cadastro.opcao!=0);
+   printf(" Processando...");
+   Sleep(1000);
+   printf("\n-------------VOLTE SEMPRE!!---------------"); //MENSAGEM DE SAÍDA DO PROGRAMA
+}
